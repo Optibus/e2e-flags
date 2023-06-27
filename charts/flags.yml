@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flags-api-deployment
+  labels:
+    app.kubernetes.io/name: flags-api-label
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flags-api-label
+  template:
+    metadata:
+      labels:
+        app: flags-api-label
+    spec:
+      containers:
+        - name: flags-api
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "1"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+          image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:latest
+          command: ['node']
+          args: ['dist/server/index.js']
+          env:
+            - name: "HOST"
+              value: "0.0.0.0"
+            - name: "PORT"
+              value: "3000"
+          ports:
+          - containerPort: 3000
+            protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cron-fetcher-deployment
+  labels:
+    app.kubernetes.io/name: cron-fetcher-label
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cron-fetcher-label
+  template:
+    metadata:
+      labels:
+        app: cron-fetcher-label
+    spec:
+      containers:
+        - name: cron-fetcher
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "1"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+          image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:latest
+          command: ['node']
+          args: ['dist/cron/index.js']
+          env:
+            - name: AWS_REGION
+              value: "us-east-2"
+            - name: CRON_INTERVAL
+              value: "5"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: flags-api-internal.optibus.com
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+  finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+  name: flags-api-service
+  namespace: e2e-flags
+spec:
+  allocateLoadBalancerNodePorts: true
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: flags-api-label
+  sessionAffinity: None
+  type: LoadBalancer
