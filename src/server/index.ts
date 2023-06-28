@@ -1,4 +1,5 @@
 import express from "express";
+import gracefulShutdown from "http-graceful-shutdown";
 import { logger } from "../logger";
 import { getFlagsApi } from "./get-flags";
 
@@ -18,6 +19,29 @@ app.get("/get-flags", async (req, res) => {
   logger.log("done");
 });
 
-app.listen(port, host, () => {
+app.get("/delay", (req, res) => {
+  logger.log("got a call");
+  setTimeout(() => {
+    res.send();
+    logger.log("done");
+  }, 5 * 1000);
+});
+
+const server = app.listen(port, host, () => {
   logger.log(`[ ready ] http://${host}:${port}`);
+});
+
+gracefulShutdown(server, {
+  onShutdown: (signal) => {
+    logger.log("shutting down", signal);
+    return Promise.resolve();
+  },
+});
+
+process.on("SIGTERM", () => {
+  logger.log("SIGTERM");
+});
+
+process.on("SIGINT", () => {
+  logger.log("SIGINT");
 });
