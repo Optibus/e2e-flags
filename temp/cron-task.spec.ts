@@ -1,7 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
-import { getDataFromSecret, secretPromise } from "../get-secret";
-import { getClient, FlagRedisKey, getObj } from "../redis";
-import { cronTask } from "./cron-task";
+import { getDataFromSecret, secretPromise } from "../src/utils/get-secret";
+import { getClient, FlagRedisKey, getObj } from "../src/storage-provider/redis";
+import { cronTask } from "../src/services/cron/cron-task";
 
 describe("cron-task", () => {
   test("set", async () => {

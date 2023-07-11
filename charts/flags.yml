@@ -62,8 +62,10 @@ spec:
               cpu: "1"
           image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:latest
           command: ['node']
-          args: ['dist/server/index.js']
+          args: ['dist/services/server/index.js']
           env:
+            - name: AWS_REGION
+              value: "us-east-2"
             - name: REDIS_SERVICE_SERVICE_HOST
               value: "e2e-flags.gzkp6i.ng.0001.use2.cache.amazonaws.com"
             - name: "HOST"
@@ -99,7 +101,7 @@ spec:
                   cpu: "1"
               image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:latest
               command: ['node']
-              args: ['dist/cron/index.js']
+              args: ['dist/services/cron/index.js']
               env:
                 - name: REDIS_SERVICE_SERVICE_HOST
                   value: "e2e-flags.gzkp6i.ng.0001.use2.cache.amazonaws.com"

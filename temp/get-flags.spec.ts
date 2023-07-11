@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import { getFlagsApi } from "./get-flags";
+import { getFlagsApi } from "../src/services/server/get-flags";
 
 describe("api", () => {
   test("call", async () => {
