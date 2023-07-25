@@ -1,9 +1,10 @@
 import express from "express";
 import { IFlagsProvider } from "flags-provider/interface";
 import gracefulShutdown from "http-graceful-shutdown";
+import randToken from "rand-token";
 import { FlagRedisKey, IStorage } from "storage-provider/interface";
 import { StorageRedundancy } from "storage-provider/storage-redundancy";
-import { logger } from "utils/logger";
+import { Logger, logger } from "utils/logger";
 import { objectHash } from "utils/object-hash";
 import { getFlagsApi } from "./get-flags";
 
@@ -11,6 +12,8 @@ declare global {
   namespace Express {
     interface Request {
       flagsProvider: IFlagsProvider;
+      logger: Logger;
+      requestId: string;
     }
   }
 }
@@ -30,9 +33,12 @@ export const startServer = (
   const app = express();
 
   app.use(async (req, res, next) => {
-    logger.log(`got a call to ${req.originalUrl}`);
+    const requestId = randToken.generate(16);
+    req.requestId = requestId;
+    req.logger = new Logger({ requestId });
+    req.logger.log(`got a call to ${req.originalUrl}`);
     res.on("finish", () => {
-      logger.log("Request finished");
+      req.logger.log("Request finished");
     });
     next();
   });
@@ -40,6 +46,7 @@ export const startServer = (
   app.get("/get-flags", async (req, res) => {
     try {
       const flagObj = await getFlagsApi(
+        req.logger,
         storageRedundancy,
         flagsProvider,
         flagRedisKey
@@ -52,7 +59,11 @@ export const startServer = (
 
   app.get("/init", async (req, res) => {
     try {
-      const flagObj = await getFlagsApi(storageRedundancy, flagsProvider);
+      const flagObj = await getFlagsApi(
+        req.logger,
+        storageRedundancy,
+        flagsProvider
+      );
       const hash = objectHash.toHash(flagObj);
       await storageRedundancy.set(hash, flagObj);
       res.send({ hash });
@@ -69,13 +80,15 @@ export const startServer = (
         try {
           flagObj = await storageRedundancy.get(hash);
         } catch (e) {
-          logger.error(e);
+          // @ts-ignore
+          req.logger.error(e);
         }
       } else {
-        logger.error("no hash was sent, reverting to get flags from api");
+        req.logger.error("no hash was sent, reverting to get flags from api");
       }
       if (!flagObj) {
         flagObj = await getFlagsApi(
+          req.logger,
           storageRedundancy,
           flagsProvider,
           flagRedisKey
@@ -93,7 +106,7 @@ export const startServer = (
 
   gracefulShutdown(server, {
     onShutdown: (signal) => {
-      logger.log("shutting down", signal);
+      logger.log(`shutting down, signal ${signal}`);
       return Promise.resolve();
     },
   });

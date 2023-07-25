@@ -1,4 +1,4 @@
-const { lodashOptimizeImports } = require("@optimize-lodash/esbuild-plugin");
+// const { lodashOptimizeImports } = require("@optimize-lodash/esbuild-plugin");
 
 
 module.exports = {
@@ -6,7 +6,7 @@ module.exports = {
     esbuild: {
         bundle: true,
         sourcemap: 'inline',
-        plugins: [lodashOptimizeImports()]
+        // plugins: [lodashOptimizeImports()]
     },
     tsConfigFile: "tsconfig.base.json",
     // Prebuild hook

@@ -115,6 +115,7 @@ kind: Service
 metadata:
   annotations:
     external-dns.alpha.kubernetes.io/hostname: flags-api-internal.optibus.com
+    service.beta.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=optibus-access-logs-us-east-2,access_logs.s3.prefix=e2e-flags
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
     service.beta.kubernetes.io/aws-load-balancer-internal: "true"
   finalizers:

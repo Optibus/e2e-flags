@@ -16,6 +16,7 @@
   "devDependencies": {
     "@optibus/eslint-config-ts": "^1.1.2",
     "@optimize-lodash/esbuild-plugin": "^2.0.2",
+    "@types/bunyan": "^1.8.8",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
     "@types/lodash": "^4.14.195",
@@ -38,8 +39,10 @@
   "dependencies": {
     "airtable": "^0.12.1",
     "aws-sdk": "^2.1405.0",
+    "bunyan": "^1.8.15",
     "express": "4.18.2",
     "http-graceful-shutdown": "^3.1.13",
+    "rand-token": "^1.0.1",
     "redis": "^4.6.7"
   },
   "keywords": [],
