@@ -59,7 +59,7 @@ spec:
             limits:
               memory: "1Gi"
               cpu: "1"
-          image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:latest
+          image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:23-09-11-01
           command: ['node']
           args: ['dist/services/server/index.js']
           env:
@@ -105,7 +105,7 @@ spec:
                 limits:
                   memory: "1Gi"
                   cpu: "1"
-              image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:latest
+              image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:23-09-11-01
               command: ['node']
               args: ['dist/services/cron/index.js']
               env:

@@ -61,7 +61,11 @@ export class AirtableFlagsProvider implements IFlagsProvider {
 
     // @ts-ignore
     const filterFlags = (flag) => {
-      return flag.fields.Status && flag.fields.Status.match("Stage");
+      return (
+        flag.fields.Status &&
+        (flag.fields.Status.match("Stage") ||
+          flag.fields.Status.match("deprecation in RC"))
+      );
     };
 
     return flags.filter(filterFlags).reduce((result, current) => {
