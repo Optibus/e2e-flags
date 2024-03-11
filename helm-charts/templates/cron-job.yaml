@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron-fetcher-job
+  labels:
+    app.kubernetes.io/name: cron-fetcher-label
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: cron-fetcher
+              imagePullPolicy: Always
+              resources:
+                requests:
+                  memory: "1Gi"
+                  cpu: "1"
+                limits:
+                  memory: "1Gi"
+                  cpu: "1"
+              image: {{ .Values.ecr.image }}
+              command: ['node']
+              args: ['dist/services/cron/index.js']
+              env:
+                - name: REDIS_SERVICE_SERVICE_HOST
+                  value: "e2e-flags.gzkp6i.ng.0001.use2.cache.amazonaws.com"
+                - name: AWS_REGION
+                  value: "us-east-2"
+                - name: CRON_INTERVAL
+                  value: "5"
+          tolerations:
+            - effect: NoSchedule
+              key: dedicated
+              operator: Equal
+              value: on-schedule
+          nodeSelector:
+            kops.k8s.io/instancegroup: on-schedule

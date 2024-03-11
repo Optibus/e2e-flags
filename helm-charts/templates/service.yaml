@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: flags-api-internal.optibus.com
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: {{ .Values.alb.certificate_arn }}
+    service.beta.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=optibus-access-logs-us-east-2,access_logs.s3.prefix=e2e-flags
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+  finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+  name: flags-api-service
+  namespace: e2e-flags
+spec:
+  allocateLoadBalancerNodePorts: true
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - name: http
+      port: 443
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: flags-api-label
+  sessionAffinity: None
+  type: LoadBalancer
