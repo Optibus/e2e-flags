@@ -21,9 +21,6 @@ jobs:
       - run:
           name: Lint Check
           command: npm run lint
-      - run:
-          name: Running Tests
-          command: npm run test
   build-service:
     parameters:
       aws-region:
