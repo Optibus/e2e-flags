@@ -1,18 +1,12 @@
 import express from "express";
-import { AirtableFlagsProvider } from "flags-provider/airtable";
-import { FlagsReturnValue, IFlagsProvider } from "flags-provider/interface";
+import { IFlagsProvider } from "flags-provider/interface";
 import gracefulShutdown from "http-graceful-shutdown";
-import _ from "lodash";
 import randToken from "rand-token";
 import { FlagRedisKey, IStorage } from "storage-provider/interface";
 import { StorageRedundancy } from "storage-provider/storage-redundancy";
 import { Logger, logger } from "utils/logger";
 import { objectHash } from "utils/object-hash";
 import { getFlagsApi, getFlagsApiV2, isRegistered } from "./get-flags";
-
-const airtableSecret = process.env.AIRTABLE_TOKEN as string;
-
-const airtableFlagProvider = new AirtableFlagsProvider(airtableSecret);
 
 declare global {
   namespace Express {
@@ -163,24 +157,7 @@ export const startServer = (
     }
   });
 
-  app.post("/is-registered", async (req, res) => {
-    try {
-      // get list from the body
-      const list = req.body.list as string[];
-      // check if the flag is in airtable
-      const flagObj: FlagsReturnValue =
-        await airtableFlagProvider.getAllFlags();
-      // check if the flag is in the list
-      const registeredList = list.filter((flag) => {
-        return _.get(flagObj, flag) !== undefined;
-      });
-      res.send({ registeredList });
-    } catch (error) {
-      res.status(500).send({ error });
-    }
-  });
-
-  app.get("/v2/hash", async (req, res) => {
+  app.get("/hash", async (req, res) => {
     try {
       const hash = req.query.hash as string;
       let flagObj;
