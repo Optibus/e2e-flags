@@ -6,12 +6,12 @@ import randToken from "rand-token";
 import {
   FlagsReturnValue,
   IFlagsProvider,
-} from "../../flags-provider/interface";
-import { FlagRedisKey, IStorage } from "../../storage-provider/interface";
-import { StorageRedundancy } from "../../storage-provider/storage-redundancy";
-import { Logger, logger } from "../../utils/logger";
-import { objectHash } from "../../utils/object-hash";
-import { getFlagsApi } from "./get-flags";
+} from "flags-provider/interface";
+import { FlagRedisKey, IStorage } from "storage-provider/interface";
+import { StorageRedundancy } from "storage-provider/storage-redundancy";
+import { Logger, logger } from "utils/logger";
+import { objectHash } from "utils/object-hash";
+import { getFlagsApi, getFlagsApiV2, isRegistered } from "./get-flags";
 
 const airtableSecret = process.env.AIRTABLE_TOKEN as string;
 
@@ -68,6 +68,62 @@ export const startServer = (
     }
   });
 
+  app.get("/v2/get-flags", async (req, res) => {
+    try {
+      const flagObj = await getFlagsApiV2(
+        req.logger,
+        storageRedundancy,
+        flagsProvider
+      );
+      res.send(flagObj);
+    } catch (error) {
+      res.status(500).send({ error });
+    }
+  });
+
+  app.post(
+    "/is-registered",
+    express.json({ type: "application/json" }),
+    async (req, res) => {
+      try {
+        const { list } = req.body;
+        const nonRegisteredList = await isRegistered(flagsProvider, list);
+        if (!nonRegisteredList.length) {
+          res.status(200).end();
+        } else {
+          res.status(500).send({ nonRegisteredList });
+        }
+      } catch (error) {
+        res.status(500).send({ error });
+      }
+    }
+  );
+
+  app.get("/v2/init", async (req, res) => {
+    try {
+      const branch = req.query.branch as unknown as string;
+      let flagObj;
+      if (["hotfix", "rc"].includes(branch)) {
+        flagObj = await getFlagsApi(
+          req.logger,
+          storageRedundancy,
+          flagsProvider
+        );
+      } else {
+        flagObj = await getFlagsApiV2(
+          req.logger,
+          storageRedundancy,
+          flagsProvider
+        );
+      }
+      const hash = objectHash.toHash(flagObj);
+      await storageRedundancy.set(hash, flagObj);
+      res.send({ hash });
+    } catch (error) {
+      res.status(500).send({ error });
+    }
+  });
+
   app.get("/init", async (req, res) => {
     try {
       const flagObj = await getFlagsApi(
@@ -78,6 +134,33 @@ export const startServer = (
       const hash = objectHash.toHash(flagObj);
       await storageRedundancy.set(hash, flagObj);
       res.send({ hash });
+    } catch (error) {
+      res.status(500).send({ error });
+    }
+  });
+
+  app.get("/v2/hash", async (req, res) => {
+    try {
+      const hash = req.query.hash as string;
+      let flagObj;
+      if (hash) {
+        try {
+          flagObj = await storageRedundancy.get(hash);
+        } catch (e) {
+          // @ts-ignore
+          req.logger.error(e);
+        }
+      } else {
+        req.logger.error("no hash was sent, reverting to get flags from api");
+      }
+      if (!flagObj) {
+        flagObj = await getFlagsApiV2(
+          req.logger,
+          storageRedundancy,
+          flagsProvider
+        );
+      }
+      res.send(flagObj);
     } catch (error) {
       res.status(500).send({ error });
     }

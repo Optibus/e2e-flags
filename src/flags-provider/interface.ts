@@ -4,8 +4,10 @@ export type FlagsReturnValue = {
   };
 };
 
+type FN = (status: string) => boolean;
+
 export interface IFlagsProvider {
-  getFlags: (query?: string) => Promise<FlagsReturnValue>;
+  getFlags: (query?: string, fn?: FN) => Promise<FlagsReturnValue>;
 
   disconnect?: () => Promise<void>;
 }

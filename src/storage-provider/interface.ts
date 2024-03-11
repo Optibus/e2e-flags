@@ -5,3 +5,4 @@ export interface IStorage {
 }
 
 export const FlagRedisKey = "allFlags";
+export const FlagRedisKeyV2 = "allFlagsV22";

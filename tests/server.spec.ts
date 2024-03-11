@@ -1,5 +1,6 @@
 import * as http from "http";
 import { Express } from "express";
+import { AirtableFlagsProvider } from "flags-provider/airtable";
 import { cronTask } from "services/cron/cron-task";
 import { startServer } from "services/server/main";
 import { IStorage } from "storage-provider/interface";
@@ -7,7 +8,9 @@ import { LocalStorage } from "storage-provider/local";
 import { RedisStorage } from "storage-provider/redis";
 
 import request from "supertest";
-import { FakeFlagsProvider } from "./mocks/flags-provider";
+// import { FakeFlagsProvider } from "./mocks/flags-provider";
+
+const FakeFlagsProvider = AirtableFlagsProvider;
 
 const curl = (app: Express, url: string) => {
   return new Promise((resolve, reject) => {
@@ -42,7 +45,9 @@ describe("api tests", () => {
   beforeEach(() => {
     externalStorage = new RedisStorage();
     storage2 = new LocalStorage();
-    flagsProvider = new FakeFlagsProvider();
+    flagsProvider = new FakeFlagsProvider(
+      "patdlUvTQOG12JRCJ.65dab8017b1a209aff8234fa0449d277b12aeed1ee40b2496a400967d6380ea9"
+    );
     flagRedisKey = String(Math.random() * 1000 + 3000);
     const port = Math.floor(Math.random() * 1000 + 3000);
     ({ server, app } = startServer(
@@ -68,8 +73,8 @@ describe("api tests", () => {
   });
   describe("/get-flags", () => {
     test("should call fake provider get flags", async () => {
-      flagsProvider.setData(flagValues);
-      const result = await curl(app, "/get-flags");
+      // flagsProvider.setData(flagValues);
+      const result = await curl(app, "/v2/get-flags");
       expect(flagsProvider.numberOfCalls).toBe(1);
       expect(result).toMatchObject(flagValues);
     }, 60000);

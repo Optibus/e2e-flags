@@ -15,7 +15,7 @@ metadata:
   labels:
     app.kubernetes.io/name: flags-api-label
 spec:
-  replicas: 3
+  replicas: 4
   selector:
     matchLabels:
       app: flags-api-label
@@ -59,7 +59,7 @@ spec:
             limits:
               memory: "1Gi"
               cpu: "1"
-          image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:23-09-11-01
+          image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:v2-24-01-02-01
           command: ['node']
           args: ['dist/services/server/index.js']
           env:
@@ -105,7 +105,7 @@ spec:
                 limits:
                   memory: "1Gi"
                   cpu: "1"
-              image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:23-09-11-01
+              image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:v2-24-01-02-01
               command: ['node']
               args: ['dist/services/cron/index.js']
               env:
@@ -135,6 +135,37 @@ metadata:
   finalizers:
     - service.kubernetes.io/load-balancer-cleanup
   name: flags-api-service
+  namespace: e2e-flags
+spec:
+  allocateLoadBalancerNodePorts: true
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - name: http
+      port: 443
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: flags-api-label
+  sessionAffinity: None
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-security-groups: sg-04dbcc737d45362ad
+    external-dns.alpha.kubernetes.io/hostname: flags-api-external.optibus.com
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-2:008770191051:certificate/d3f1d4be-312d-4c49-a025-35a7fefdd47b
+    service.beta.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=optibus-access-logs-us-east-2,access_logs.s3.prefix=e2e-flags
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-internal: "false"
+  finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+  name: flags-api-service-external
   namespace: e2e-flags
 spec:
   allocateLoadBalancerNodePorts: true

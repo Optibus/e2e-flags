@@ -33,6 +33,10 @@ const fixType = (type: unknown, fields: Record<string, any>) => {
   return type;
 };
 
+const defaultFilterFn = (status: string) => {
+  return Boolean(status.match("Stage") || status.match("deprecation in RC"));
+};
+
 export class AirtableFlagsProvider implements IFlagsProvider {
   apiKey: string;
 
@@ -40,7 +44,10 @@ export class AirtableFlagsProvider implements IFlagsProvider {
     this.apiKey = apiKey;
   }
 
-  async getFlags(query: string = "NOT({Status} = 'Deprecated')") {
+  async getFlags(
+    query: string = "NOT({Status} = 'Deprecated')",
+    fn: (status: string) => boolean = defaultFilterFn
+  ) {
     const base = airTableCreator.get(this.apiKey);
     const getFlagsApi = () => {
       const page = base("Features").select({
@@ -61,11 +68,7 @@ export class AirtableFlagsProvider implements IFlagsProvider {
 
     // @ts-ignore
     const filterFlags = (flag) => {
-      return (
-        flag.fields.Status &&
-        (flag.fields.Status.match("Stage") ||
-          flag.fields.Status.match("deprecation in RC"))
-      );
+      return flag.fields.Status && fn(flag.fields.Status);
     };
 
     return flags.filter(filterFlags).reduce((result, current) => {
