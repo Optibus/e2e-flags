@@ -1,0 +1,9 @@
+# kubetpl:syntax:go-template
+alb:
+  certificate_arn: arn:aws:acm:us-east-2:008770191051:certificate/d3f1d4be-312d-4c49-a025-35a7fefdd47b
+ecr:
+  image: 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:{{ .TAG }}
+aws:
+  region: us-east-2
+aftermath:
+  features_url: https://aftermath-optibus-api.optibus.co/features

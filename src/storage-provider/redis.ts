@@ -1,9 +1,9 @@
 import * as console from "console";
 import * as process from "process";
 import { createClient } from "redis";
-import { IStorage } from "storage-provider/interface";
-import { logger } from "utils/logger";
-import { isObject } from "utils/my-dash";
+import { logger } from "../utils/logger";
+import { isObject } from "../utils/my-dash";
+import { IStorage } from "./interface";
 
 export class RedisStorage implements IStorage {
   private client: ReturnType<typeof createClient>;

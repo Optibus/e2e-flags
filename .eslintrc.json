@@ -1,5 +1,5 @@
 {
   "root": true,
   "extends": ["@optibus/eslint-config-ts"],
-  "ignorePatterns": ["dist/**", "charts/**"]
+  "ignorePatterns": ["dist/**", "charts/**", "node_modules/**", "temp/**"]
 }
