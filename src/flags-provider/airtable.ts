@@ -75,4 +75,34 @@ export class AirtableFlagsProvider implements IFlagsProvider {
       return result;
     }, {} as FlagsReturnValue);
   }
+
+  async getAllFlags(query: string = "NOT({Status} = 'Deprecated')") {
+    const base = airTableCreator.get(this.apiKey);
+    const getFlagsApi = () => {
+      const page = base("Features").select({
+        view: "Grid view",
+        filterByFormula: query,
+        fields: [
+          "Feature Name",
+          "flag full path",
+          "Status",
+          "flag required value",
+          "flag custom value",
+        ],
+      });
+      return page.all();
+    };
+
+    const flags = await getFlagsApi();
+
+    return flags.reduce((result, current) => {
+      const key = current.fields["flag full path"] as string;
+      const value = fixType(
+        current.fields["flag required value"],
+        current.fields
+      );
+      set(result, key, value);
+      return result;
+    }, {} as FlagsReturnValue);
+  }
 }
