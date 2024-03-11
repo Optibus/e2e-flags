@@ -1,12 +1,9 @@
 import express from "express";
 import { AirtableFlagsProvider } from "flags-provider/airtable";
+import { FlagsReturnValue, IFlagsProvider } from "flags-provider/interface";
 import gracefulShutdown from "http-graceful-shutdown";
 import _ from "lodash";
 import randToken from "rand-token";
-import {
-  FlagsReturnValue,
-  IFlagsProvider,
-} from "flags-provider/interface";
 import { FlagRedisKey, IStorage } from "storage-provider/interface";
 import { StorageRedundancy } from "storage-provider/storage-redundancy";
 import { Logger, logger } from "utils/logger";
