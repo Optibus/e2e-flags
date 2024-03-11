@@ -31,6 +31,13 @@ spec:
                   value: "us-east-2"
                 - name: CRON_INTERVAL
                   value: "5"
+              envFrom:
+                - configMapRef:
+                    name: e2e-flags-config
+                - secretRef:
+                    name: e2e-flags-secret-optibus-integrations
+                - secretRef:
+                    name: e2e-flags-airtable-secret
           tolerations:
             - effect: NoSchedule
               key: dedicated
