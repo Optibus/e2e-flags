@@ -90,7 +90,6 @@ export const startServer = (
       // check if the flag is in airtable
       const flagObj: FlagsReturnValue =
         await airtableFlagProvider.getAllFlags();
-      console.log(JSON.stringify(flagObj));
       // check if the flag is in the list
       const registeredList = list.filter((flag) => {
         return _.get(flagObj, flag) !== undefined;
