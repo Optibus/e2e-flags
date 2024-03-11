@@ -1,11 +1,13 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
-import { IFlagsProvider } from "flags-provider/interface";
 import gracefulShutdown from "http-graceful-shutdown";
 import randToken from "rand-token";
-import { FlagRedisKey, IStorage } from "storage-provider/interface";
-import { StorageRedundancy } from "storage-provider/storage-redundancy";
-import { Logger, logger } from "utils/logger";
-import { objectHash } from "utils/object-hash";
+import { IFlagsProvider } from "../../flags-provider/interface";
+import { FlagRedisKey, IStorage } from "../../storage-provider/interface";
+import { StorageRedundancy } from "../../storage-provider/storage-redundancy";
+import { Logger, logger } from "../../utils/logger";
+import { objectHash } from "../../utils/object-hash";
 import { getFlagsApi } from "./get-flags";
 
 declare global {

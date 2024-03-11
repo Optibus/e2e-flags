@@ -1,18 +1,37 @@
-import { AirtableFlagsProvider } from "flags-provider/airtable";
+import dotenv from "dotenv";
 import { RedisStorage } from "storage-provider/redis";
-import { EnvSecrets, getDataFromSecret, secretPromise } from "utils/get-secret";
-import { logger } from "utils/logger";
+import { AftermathAirtableFlagsProvider } from "../../flags-provider/aftermath-airtable";
+import { logger } from "../../utils/logger";
 import { cronTask } from "./cron-task";
+
+dotenv.config();
+
+const aftermathSecret = process.env.AFTERMATH_SECRET;
+const airtableSecret = process.env.AIRTABLE_TOKEN;
+
+if (!aftermathSecret) {
+  throw new Error("AFTERMATH_SECRET is not set");
+}
+
+if (!airtableSecret) {
+  throw new Error("AIRTABLE_TOKEN is not set");
+}
 
 const redis = new RedisStorage();
 
 export const runTaskWithSecret = async (
-  secrets: EnvSecrets,
+  secrets: {
+    aftermathSecret: string;
+    airtableSecret: string;
+  },
   exitWhenDone: boolean = true
 ) => {
   logger.log("starting cron job");
-  const airtable = new AirtableFlagsProvider(secrets.AIRTABLE_TOKEN);
-  await cronTask(airtable, redis);
+  const flagProvider = new AftermathAirtableFlagsProvider(
+    secrets.aftermathSecret,
+    secrets.airtableSecret
+  );
+  await cronTask(flagProvider, redis);
   if (exitWhenDone) {
     logger.log("shutting down");
     process.exit(0);
@@ -20,6 +39,11 @@ export const runTaskWithSecret = async (
 };
 
 export const runJob = async (exitWhenDone: boolean = true) => {
-  const secrets = await getDataFromSecret(secretPromise);
-  return runTaskWithSecret(secrets, exitWhenDone);
+  return runTaskWithSecret(
+    {
+      aftermathSecret,
+      airtableSecret,
+    },
+    exitWhenDone
+  );
 };

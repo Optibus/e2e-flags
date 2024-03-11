@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { isObject } from "utils/my-dash";
+import { isObject } from "./my-dash";
 
 class ReversibleHasher {
   private key = Buffer.alloc(32);

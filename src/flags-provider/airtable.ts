@@ -1,6 +1,6 @@
 import Airtable from "airtable";
 import { AirtableBase } from "airtable/lib/airtable_base";
-import { set } from "utils/my-dash";
+import { set } from "../utils/my-dash";
 import { FlagsReturnValue, IFlagsProvider } from "./interface";
 
 class AirtableInstance {

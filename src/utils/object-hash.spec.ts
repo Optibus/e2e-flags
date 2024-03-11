@@ -1,4 +1,4 @@
-import { objectHash } from "utils/object-hash";
+import { objectHash } from "./object-hash";
 
 describe("object-hash", () => {
   test("reversibility", () => {
