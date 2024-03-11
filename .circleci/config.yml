@@ -1,0 +1,78 @@
+version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@4.1.1
+jobs:
+  main:
+    docker:
+      - image: cimg/node:18.16.1
+      - image: cimg/redis:6.2.6
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          key: npm-deps-{{ checksum "package-lock.json" }}
+      - run:
+          name: Installing Packages
+          command: npm ci
+      - save_cache:
+          key: npm-deps-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Lint Check
+          command: npm run lint
+      - run:
+          name: Running Tests
+          command: npm run test
+  build-service:
+    parameters:
+      aws-region:
+        type: string
+        default: us-east-2
+      ecr:
+        type: string
+        default: flags-e2e
+      service-name:
+        type: string
+        default: E2E-Flags
+    docker:
+      - image: cimg/node:18.16.1
+      - image: cimg/aws:2023.09
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          key: npm-deps-{{ checksum "package-lock.json" }}
+      - run:
+          name: Installing Packages
+          command: npm i
+      - aws-cli/setup:
+          role_arn: arn:aws:iam::008770191051:role/e2e-flags-circleci
+      - run:
+          name: Log into AWS-ECR
+          command: |
+            aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com
+      - run:
+          name: Building << parameters.service-name >>
+          command: docker buildx build --platform linux/amd64 --build-arg REGISTRY=$AWS_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com -f Dockerfile . -t $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.aws-region >>.amazonaws.com/<< parameters.ecr >>:$CIRCLE_BRANCH-$CIRCLE_SHA1
+      - run:
+          name: Log into AWS-ECR
+          command: |
+            aws ecr get-login-password --region << parameters.aws-region >> | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.aws-region >>.amazonaws.com
+      - run:
+          name: Pushing << parameters.service-name >> to ECR
+          command: docker push $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.aws-region >>.amazonaws.com/<< parameters.ecr >>:$CIRCLE_BRANCH-$CIRCLE_SHA1
+workflows:
+  build:
+    jobs:
+      - main
+      - build-service:
+          context:
+            - aws
+          name: build
+          requires:
+            - main
+          filters:
+            branches:
+              only:
+                - main
