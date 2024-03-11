@@ -1,6 +1,6 @@
-import { IFlagsProvider } from "flags-provider/interface";
-import { IStorage, FlagRedisKey } from "storage-provider/interface";
-import { Logger } from "utils/logger";
+import { IFlagsProvider } from "../../flags-provider/interface";
+import { IStorage, FlagRedisKey } from "../../storage-provider/interface";
+import { Logger } from "../../utils/logger";
 
 export const getFlagsApi = async (
   logger: Logger,

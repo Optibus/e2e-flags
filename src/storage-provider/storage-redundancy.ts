@@ -1,5 +1,6 @@
-import { IStorage } from "storage-provider/interface";
-import { logger } from "utils/logger";
+import { logger } from "../utils/logger";
+import { IStorage } from "./interface";
+
 export class StorageRedundancy implements IStorage {
   private externalStorage: IStorage;
 
