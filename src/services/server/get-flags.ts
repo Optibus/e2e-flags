@@ -23,16 +23,11 @@ export const getFlagsApi = async (
 };
 
 export const flagsV2 = (flagProvider: IFlagsProvider) => {
-  return flagProvider.getFlags(
-    "NOT({Status} = 'Deprecated')",
-    (status: string) => {
-      return Boolean(
-        status.match("Stage") ||
-          status.match("deprecation in RC") ||
-          status.match("Before deployment")
-      );
-    }
-  );
+  return flagProvider.getFlags({
+    deprecated: false,
+    active: true,
+    beforeDeployment: true,
+  });
 };
 
 export const isRegistered = async (

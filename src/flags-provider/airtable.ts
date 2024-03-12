@@ -1,7 +1,7 @@
 import Airtable from "airtable";
 import { AirtableBase } from "airtable/lib/airtable_base";
 import { set } from "../utils/my-dash";
-import { FlagsReturnValue, IFlagsProvider } from "./interface";
+import { FlagsQuery, FlagsReturnValue, IFlagsProvider } from "./interface";
 
 class AirtableInstance {
   base: AirtableBase;
@@ -33,8 +33,15 @@ const fixType = (type: unknown, fields: Record<string, any>) => {
   return type;
 };
 
-const defaultFilterFn = (status: string) => {
-  return Boolean(status.match("Stage") || status.match("deprecation in RC"));
+const filterAirtableFunction = (query: FlagsQuery, status: string) => {
+  const active = query.active
+    ? Boolean(status.match("Stage")) ||
+      (query.beforeDeployment && status.match("deprecation in RC"))
+    : true;
+  const beforeDeployment = query.beforeDeployment
+    ? status.match("Before deployment")
+    : true;
+  return Boolean(active || beforeDeployment);
 };
 
 export class AirtableFlagsProvider implements IFlagsProvider {
@@ -45,14 +52,17 @@ export class AirtableFlagsProvider implements IFlagsProvider {
   }
 
   async getFlags(
-    query: string = "NOT({Status} = 'Deprecated')",
-    fn: (status: string) => boolean = defaultFilterFn
+    query: FlagsQuery = {
+      deprecated: false,
+      active: true,
+      beforeDeployment: false,
+    }
   ) {
     const base = airTableCreator.get(this.apiKey);
     const getFlagsApi = () => {
       const page = base("Features").select({
         view: "Grid view",
-        filterByFormula: query,
+        filterByFormula: query.deprecated ? "" : "NOT({Status} = 'Deprecated')",
         fields: [
           "Feature Name",
           "flag full path",
@@ -66,9 +76,10 @@ export class AirtableFlagsProvider implements IFlagsProvider {
 
     const flags = await getFlagsApi();
 
-    // @ts-ignore
-    const filterFlags = (flag) => {
-      return flag.fields.Status && fn(flag.fields.Status);
+    const filterFlags = (flag: any) => {
+      return (
+        flag.fields.Status && filterAirtableFunction(query, flag.fields.Status)
+      );
     };
 
     return flags.filter(filterFlags).reduce((result, current) => {
@@ -78,36 +89,6 @@ export class AirtableFlagsProvider implements IFlagsProvider {
         current.fields
       );
       // "features.gradual.momo.enabled", true
-      set(result, key, value);
-      return result;
-    }, {} as FlagsReturnValue);
-  }
-
-  async getAllFlags(query: string = "NOT({Status} = 'Deprecated')") {
-    const base = airTableCreator.get(this.apiKey);
-    const getFlagsApi = () => {
-      const page = base("Features").select({
-        view: "Grid view",
-        filterByFormula: query,
-        fields: [
-          "Feature Name",
-          "flag full path",
-          "Status",
-          "flag required value",
-          "flag custom value",
-        ],
-      });
-      return page.all();
-    };
-
-    const flags = await getFlagsApi();
-
-    return flags.reduce((result, current) => {
-      const key = current.fields["flag full path"] as string;
-      const value = fixType(
-        current.fields["flag required value"],
-        current.fields
-      );
       set(result, key, value);
       return result;
     }, {} as FlagsReturnValue);

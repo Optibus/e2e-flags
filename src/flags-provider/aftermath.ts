@@ -1,7 +1,7 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { set } from "../utils/my-dash";
-import { FlagsReturnValue, IFlagsProvider } from "./interface";
+import { FlagsQuery, FlagsReturnValue, IFlagsProvider } from "./interface";
 
 dotenv.config();
 
@@ -30,7 +30,13 @@ export class AftermathFlagsProvider implements IFlagsProvider {
     this.apiKey = apiKey;
   }
 
-  async getFlags() {
+  async getFlags(
+    query: FlagsQuery = {
+      deprecated: false,
+      active: true,
+      beforeDeployment: false,
+    }
+  ) {
     try {
       const res = await axios.get<any[]>(aftermathFeaturesURL, {
         headers: {
@@ -41,7 +47,21 @@ export class AftermathFlagsProvider implements IFlagsProvider {
       const flags = res.data;
 
       const filterFlags = (flag: any) => {
-        return flag.stage?.number > 0 && flag.stage?.number <= 5;
+        let shouldKeep = false;
+        if (query.active) {
+          shouldKeep = flag.stage?.number > 0 && flag.stage?.number <= 5;
+          if (
+            !shouldKeep &&
+            query.beforeDeployment &&
+            flag.stage?.number === 0
+          ) {
+            shouldKeep = true;
+          }
+        }
+        if (!shouldKeep && query.deprecated && flag.stage?.number > 5) {
+          shouldKeep = true;
+        }
+        return shouldKeep;
       };
 
       return flags.filter(filterFlags).reduce((result, current) => {
