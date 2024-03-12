@@ -32,7 +32,7 @@ export const runTaskWithSecret = async (
     secrets.airtableSecret
   );
   await cronTask(flagProvider, redis);
-  await cronTaskV2(airtable, redis);
+  await cronTaskV2(flagProvider, redis);
   if (exitWhenDone) {
     logger.log("shutting down");
     process.exit(0);

@@ -3,7 +3,7 @@
 import _ from "lodash";
 import { AftermathFlagsProvider } from "./aftermath";
 import { AirtableFlagsProvider } from "./airtable";
-import { IFlagsProvider } from "./interface";
+import { FlagsQuery, IFlagsProvider } from "./interface";
 
 export class AftermathAirtableFlagsProvider implements IFlagsProvider {
   aftermath: AftermathFlagsProvider;
@@ -15,11 +15,17 @@ export class AftermathAirtableFlagsProvider implements IFlagsProvider {
     this.airtable = new AirtableFlagsProvider(airtableApiKey);
   }
 
-  async getFlags() {
+  async getFlags(
+    query: FlagsQuery = {
+      deprecated: false,
+      active: true,
+      beforeDeployment: false,
+    }
+  ) {
     // Get flags from aftermath and airtable
     const [aftermathFlags, airtableFlags] = await Promise.all([
-      this.aftermath.getFlags(),
-      this.airtable.getFlags(),
+      this.aftermath.getFlags(query),
+      this.airtable.getFlags(query),
     ]);
 
     // Merge the flags to one object
