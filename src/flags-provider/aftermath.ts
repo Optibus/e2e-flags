@@ -11,18 +11,6 @@ if (!aftermathFeaturesURL) {
   throw new Error("AFTERMATH_FEATURES_URL is not set");
 }
 
-/**
- * a utility function to get the right value of a flag whether is a boolean or custom
- * @param type
- * @param fields
- */
-const fixType = (type: unknown) => {
-  if (type === "true") {
-    return true;
-  }
-  return type;
-};
-
 export class AftermathFlagsProvider implements IFlagsProvider {
   apiKey: string;
 
@@ -66,9 +54,8 @@ export class AftermathFlagsProvider implements IFlagsProvider {
 
       return flags.filter(filterFlags).reduce((result, current) => {
         const key = current.path as string;
-        const value = fixType(current.value);
         // "features.gradual.momo.enabled", true
-        set(result, key, value);
+        set(result, key, true);
         return result;
       }, {} as FlagsReturnValue);
     } catch (e) {
