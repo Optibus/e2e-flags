@@ -9,6 +9,7 @@
     "test": "jest",
     "lint": "eslint . --ext .ts",
     "start": "node --inspect ./dist/services/server/index.js",
+    "start-cron": "node --inspect ./dist/services/cron/index.js",
     "start-ts": "ts-node ./src/services/server/index.ts",
     "watch-mode": "tsc-watch --onSuccess \"npm run start\"",
     "docker-build": "docker build . -t 008770191051.dkr.ecr.us-east-2.amazonaws.com/flags-e2e:v2-24-01-02-01 --platform linux/amd64",
