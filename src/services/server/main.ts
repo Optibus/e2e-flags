@@ -137,7 +137,6 @@ export const startServer = (
       if (hash && req.query.hash !== "undefined") {
         try {
           flagObj = await storageRedundancy.get(hash);
-          console.log("USING CACHE");
         } catch (e) {
           // @ts-ignore
           req.logger.error(e);

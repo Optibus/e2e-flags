@@ -11,7 +11,6 @@ export class AftermathAirtableFlagsProvider implements IFlagsProvider {
   airtable: AirtableFlagsProvider;
 
   constructor(aftermathApiKey: string, airtableApiKey: string) {
-    console.log("Building AftermathAirtableFlagsProvider");
     this.aftermath = new AftermathFlagsProvider(aftermathApiKey);
     this.airtable = new AirtableFlagsProvider(airtableApiKey);
   }
@@ -24,20 +23,12 @@ export class AftermathAirtableFlagsProvider implements IFlagsProvider {
     }
   ) {
     try {
-      console.log("Calling AftermathAirtableFlagsProvider");
       // Get flags from aftermath and airtable
       const [aftermathFlags, airtableFlags] = await Promise.all([
         this.aftermath.getFlags(query),
         this.airtable.getFlags(query),
       ]);
 
-      console.log("Aftermath flags", JSON.stringify(aftermathFlags));
-      console.log("Airtable flags", JSON.stringify(airtableFlags));
-
-      console.log(
-        "Output",
-        JSON.stringify(_.merge(airtableFlags, aftermathFlags))
-      );
       // Merge the flags to one object
       return _.merge(airtableFlags, aftermathFlags);
     } catch (e) {

@@ -13,7 +13,6 @@ export const cronTask = async (
 ) => {
   const flagsDict = await flagsProviderInstance.getFlags();
   const flagsString = JSON.stringify(flagsDict) as string;
-  console.log("Flags key 1:", flagRedisKey);
   await storageProviderInstance.set(flagRedisKey, flagsString);
   return flagsProviderInstance.disconnect?.();
 };
@@ -25,9 +24,6 @@ export const cronTaskV2 = async (
 ) => {
   const flagsDict = await flagsV2(flagsProviderInstance);
   const flagsString = JSON.stringify(flagsDict) as string;
-  console.log("Flags string:", flagsString);
-  console.log("Flags key:", flagRedisKey);
   await storageProviderInstance.set(flagRedisKey, flagsString);
-  console.log("OUTPUT REDIS", await storageProviderInstance.get(flagRedisKey));
   return flagsProviderInstance.disconnect?.();
 };

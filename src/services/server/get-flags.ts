@@ -48,9 +48,7 @@ export const getFlagsApiV2 = async (
   flagRedisKey: string = FlagRedisKeyV2
 ) => {
   try {
-    console.log("Redis flag", flagRedisKey);
     const flags = await storage.get(flagRedisKey);
-    console.log("flags", JSON.stringify(flags));
     return flags;
   } catch (e) {
     // @ts-ignore
