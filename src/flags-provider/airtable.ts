@@ -48,6 +48,7 @@ export class AirtableFlagsProvider implements IFlagsProvider {
   apiKey: string;
 
   constructor(apiKey: string) {
+    console.log("Building AirtableFlagsProvider");
     this.apiKey = apiKey;
   }
 

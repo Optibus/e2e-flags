@@ -11,6 +11,7 @@ export class AftermathAirtableFlagsProvider implements IFlagsProvider {
   airtable: AirtableFlagsProvider;
 
   constructor(aftermathApiKey: string, airtableApiKey: string) {
+    console.log("Building AftermathAirtableFlagsProvider");
     this.aftermath = new AftermathFlagsProvider(aftermathApiKey);
     this.airtable = new AirtableFlagsProvider(airtableApiKey);
   }
