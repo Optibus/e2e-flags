@@ -134,7 +134,7 @@ export const startServer = (
     try {
       const hash = req.query.hash as string;
       let flagObj;
-      if (hash) {
+      if (hash && req.query.hash !== "undefined") {
         try {
           flagObj = await storageRedundancy.get(hash);
           console.log("USING CACHE");
