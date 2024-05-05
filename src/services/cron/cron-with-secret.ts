@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { AftermathAirtableFlagsProvider } from "flags-provider/aftermath-airtable";
 import { RedisStorage } from "storage-provider/redis";
 import { logger } from "utils/logger";
-import { cronTask, cronTaskV2 } from "./cron-task";
+import { cronTaskV2 } from "./cron-task";
 
 dotenv.config();
 
@@ -31,7 +31,7 @@ export const runTaskWithSecret = async (
     secrets.aftermathSecret,
     secrets.airtableSecret
   );
-  await cronTask(flagProvider, redis);
+  // await cronTask(flagProvider, redis);
   await cronTaskV2(flagProvider, redis);
   if (exitWhenDone) {
     logger.log("shutting down");
