@@ -22,13 +22,19 @@ export class AftermathAirtableFlagsProvider implements IFlagsProvider {
       beforeDeployment: false,
     }
   ) {
-    // Get flags from aftermath and airtable
-    const [aftermathFlags, airtableFlags] = await Promise.all([
-      this.aftermath.getFlags(query),
-      this.airtable.getFlags(query),
-    ]);
+    try {
+      // Get flags from aftermath and airtable
+      const [aftermathFlags, airtableFlags] = await Promise.all([
+        this.aftermath.getFlags(query),
+        this.airtable.getFlags(query),
+      ]);
 
-    // Merge the flags to one object
-    return _.merge(airtableFlags, aftermathFlags);
+      console.log("Aftermath flags", JSON.stringify(aftermathFlags));
+
+      // Merge the flags to one object
+      return _.merge(airtableFlags, aftermathFlags);
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
