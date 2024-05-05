@@ -28,5 +28,6 @@ export const cronTaskV2 = async (
   console.log("Flags string:", flagsString);
   console.log("Flags key:", flagRedisKey);
   await storageProviderInstance.set(flagRedisKey, flagsString);
+  console.log("OUTPUT REDIS", await storageProviderInstance.get(flagRedisKey));
   return flagsProviderInstance.disconnect?.();
 };
