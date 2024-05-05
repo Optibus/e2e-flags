@@ -26,6 +26,7 @@ export class AftermathFlagsProvider implements IFlagsProvider {
     }
   ) {
     try {
+      console.log(aftermathFeaturesURL, this.apiKey);
       const res = await axios.get<any[]>(aftermathFeaturesURL, {
         headers: {
           Authorization: this.apiKey,

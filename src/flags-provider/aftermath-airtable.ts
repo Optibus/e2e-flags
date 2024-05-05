@@ -24,6 +24,7 @@ export class AftermathAirtableFlagsProvider implements IFlagsProvider {
     }
   ) {
     try {
+      console.log("Calling AftermathAirtableFlagsProvider");
       // Get flags from aftermath and airtable
       const [aftermathFlags, airtableFlags] = await Promise.all([
         this.aftermath.getFlags(query),
