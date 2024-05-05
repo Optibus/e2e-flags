@@ -33,6 +33,10 @@ export class AftermathAirtableFlagsProvider implements IFlagsProvider {
 
       console.log("Aftermath flags", JSON.stringify(aftermathFlags));
 
+      console.log(
+        "Output",
+        JSON.stringify(_.merge(airtableFlags, aftermathFlags))
+      );
       // Merge the flags to one object
       return _.merge(airtableFlags, aftermathFlags);
     } catch (e) {
