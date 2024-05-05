@@ -32,6 +32,7 @@ export class AftermathAirtableFlagsProvider implements IFlagsProvider {
       ]);
 
       console.log("Aftermath flags", JSON.stringify(aftermathFlags));
+      console.log("Airtable flags", JSON.stringify(airtableFlags));
 
       console.log(
         "Output",
