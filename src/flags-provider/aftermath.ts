@@ -49,6 +49,9 @@ export class AftermathFlagsProvider implements IFlagsProvider {
         if (!shouldKeep && query.deprecated && flag.stage?.number > 5) {
           shouldKeep = true;
         }
+        if (flag.status === "paused") {
+          shouldKeep = false;
+        }
         return shouldKeep;
       };
 
