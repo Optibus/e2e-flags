@@ -37,7 +37,7 @@ export class AftermathFlagsProvider implements IFlagsProvider {
       const filterFlags = (flag: any) => {
         let shouldKeep = false;
         if (query.active) {
-          shouldKeep = flag.stage?.number > 0 && flag.stage?.number <= 5;
+          shouldKeep = flag.stage?.number > 0 && flag.stage?.number <= 6;
           if (
             !shouldKeep &&
             query.beforeDeployment &&
