@@ -18,7 +18,11 @@ export const getFlagsApi = async (
   } catch (e) {
     // @ts-ignore
     logger.error(e);
-    return flagProvider.getFlags();
+    return flagProvider.getFlags({
+      deprecated: false,
+      active: true,
+      beforeDeployment: false,
+    });
   }
 };
 
