@@ -11,7 +11,11 @@ export const cronTask = async (
   storageProviderInstance: IStorage,
   flagRedisKey: string = FlagRedisKey
 ) => {
-  const flagsDict = await flagsProviderInstance.getFlags();
+  const flagsDict = await flagsProviderInstance.getFlags({
+    deprecated: false,
+    active: true,
+    beforeDeployment: false,
+  });
   const flagsString = JSON.stringify(flagsDict) as string;
   await storageProviderInstance.set(flagRedisKey, flagsString);
   return flagsProviderInstance.disconnect?.();

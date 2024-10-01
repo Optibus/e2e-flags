@@ -26,14 +26,12 @@ export class RedisStorage implements IStorage {
   }
 
   set(key: string, value: unknown) {
-    // TODO: add expire
     let valueToSet = value;
     if (isObject(value)) {
       valueToSet = JSON.stringify(value);
     }
-    this.client.expire(key, this.SECONDS_IN_DAY);
     // @ts-ignore
-    return this.client.set(key, valueToSet);
+    return this.client.set(key, valueToSet, { EX: this.SECONDS_IN_DAY });
   }
 
   disconnect() {
