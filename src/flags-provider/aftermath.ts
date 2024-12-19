@@ -49,7 +49,7 @@ export class AftermathFlagsProvider implements IFlagsProvider {
         if (!shouldKeep && query.deprecated && flag.stage?.number > 5) {
           shouldKeep = true;
         }
-        if (flag.status === "paused") {
+        if (flag.status === "paused" || flag.status === "cancelled") {
           shouldKeep = false;
         }
         return shouldKeep;
