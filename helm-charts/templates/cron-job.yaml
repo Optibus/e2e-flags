@@ -6,8 +6,6 @@ metadata:
     app.kubernetes.io/name: cron-fetcher-label
 spec:
   schedule: "*/5 * * * *"
-  successfulJobsHistoryLimit: 0
-  failedJobsHistoryLimit: 0
   jobTemplate:
     spec:
       template:
