@@ -57,8 +57,6 @@ spec:
                 name: e2e-flags-config
             - secretRef:
                 name: e2e-flags-secret-optibus-integrations
-            - secretRef:
-                name: e2e-flags-airtable-secret
           ports:
           - containerPort: 3000
             protocol: TCP

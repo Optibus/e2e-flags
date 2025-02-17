@@ -36,8 +36,6 @@ spec:
                     name: e2e-flags-config
                 - secretRef:
                     name: e2e-flags-secret-optibus-integrations
-                - secretRef:
-                    name: e2e-flags-airtable-secret
           tolerations:
             - effect: NoSchedule
               key: dedicated
