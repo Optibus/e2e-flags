@@ -40,6 +40,6 @@ spec:
             - effect: NoSchedule
               key: dedicated
               operator: Equal
-              value: on-schedule
+              value: on-schedule-2023
           nodeSelector:
-            kops.k8s.io/instancegroup: on-schedule
+            node.kubernetes.io/instancegroup: on-schedule-2023
