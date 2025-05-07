@@ -37,7 +37,7 @@ export class AftermathFlagsProvider implements IFlagsProvider {
       const filterFlags = (flag: any) => {
         let shouldKeep = false;
         if (query.active) {
-          shouldKeep = flag.stage?.number > 0 && flag.stage?.number <= 6;
+          shouldKeep = flag.stage?.number > 0 && flag.stage?.number <= 7;
           if (
             !shouldKeep &&
             query.beforeDeployment &&
@@ -55,12 +55,15 @@ export class AftermathFlagsProvider implements IFlagsProvider {
         return shouldKeep;
       };
 
-      return flags.filter(filterFlags).reduce((result, current) => {
+      const output = flags.filter(filterFlags).reduce((result, current) => {
         const key = current.path as string;
         // "features.gradual.momo.enabled", true
         set(result, key, true);
         return result;
       }, {} as FlagsReturnValue);
+
+      console.log(JSON.stringify(output, null, 2));
+      return output;
     } catch (e) {
       console.error(e);
       return {};
